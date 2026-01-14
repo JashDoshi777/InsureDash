@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InsureAnalytics - Insurance Analytics Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Background Effects -->
+    <div class="noise"></div>
+    <div class="grid-bg"></div>
+    <div class="glow-top"></div>
+
+    <!-- Landing Page -->
+    <div id="landingPage" class="landing-page">
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="nav-logo">
+                <div class="nav-logo-icon">📊</div>
+                InsureAnalytics
+            </div>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#columns" class="nav-link">Setup</a>
+                <a href="#preview" class="nav-link">Preview</a>
+            </div>
+            <button class="nav-cta" onclick="openModal()">Get Started</button>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="hero-badge-dot"></span>
+                    <span>Free & Offline Analytics</span>
+                </div>
+                <h1 class="hero-title">
+                    Insurance Analytics<br>
+                    <span class="hero-title-accent">Made Simple</span>
+                </h1>
+                <p class="hero-desc">
+                    Upload your Excel or CSV file and instantly visualize your insurance portfolio,
+                    track renewals, and monitor performance metrics. 100% private - your data never leaves your device.
+                </p>
+                <div class="hero-cta-row">
+                    <button class="btn btn-primary" onclick="openModal()">
+                        🚀 Launch Dashboard
+                    </button>
+                    <button class="btn btn-ghost" onclick="scrollToSection('features')">
+                        Learn More →
+                    </button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">100%</div>
+                        <div class="stat-label">Private & Secure</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">Instant</div>
+                        <div class="stat-label">Data Processing</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">Free</div>
+                        <div class="stat-label">No Sign-up Required</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="dashboard-preview">
+                    <div class="preview-window">
+                        <div class="preview-titlebar">
+                            <span class="titlebar-dot dot-red"></span>
+                            <span class="titlebar-dot dot-yellow"></span>
+                            <span class="titlebar-dot dot-green"></span>
+                        </div>
+                        <div class="preview-body">
+                            <div class="preview-metrics">
+                                <div class="p-metric">
+                                    <div class="p-metric-label">Net Premium</div>
+                                    <div class="p-metric-value">₹12,45,000</div>
+                                </div>
+                                <div class="p-metric">
+                                    <div class="p-metric-label">Policies</div>
+                                    <div class="p-metric-value">156</div>
+                                </div>
+                                <div class="p-metric">
+                                    <div class="p-metric-label">Gross</div>
+                                    <div class="p-metric-value">₹14,70,000</div>
+                                </div>
+                                <div class="p-metric">
+                                    <div class="p-metric-label">Average</div>
+                                    <div class="p-metric-value">₹79,807</div>
+                                </div>
+                            </div>
+                            <div class="preview-cards">
+                                <div class="p-card">
+                                    <div class="p-card-header">
+                                        <span class="p-card-title">Jan Renewals</span>
+                                        <span class="p-card-badge">12</span>
+                                    </div>
+                                    <div class="p-card-item">ABC Corp - ₹85,000</div>
+                                    <div class="p-card-item">XYZ Ltd - ₹62,000</div>
+                                </div>
+                                <div class="p-card">
+                                    <div class="p-card-header">
+                                        <span class="p-card-title">Feb Renewals</span>
+                                        <span class="p-card-badge">8</span>
+                                    </div>
+                                    <div class="p-card-item">Delta Inc - ₹1,20,000</div>
+                                    <div class="p-card-item">Omega Co - ₹45,000</div>
+                                </div>
+                                <div class="p-card">
+                                    <div class="p-card-header">
+                                        <span class="p-card-title">Sales Targets</span>
+                                        <span class="p-card-badge">5</span>
+                                    </div>
+                                    <div class="p-card-item">Target Alpha</div>
+                                    <div class="p-card-item">Target Beta</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Elements -->
+                    <div class="float-element float-1">
+                        <div class="float-icon">📈</div>
+                        <div class="float-label">Growth</div>
+                        <div class="float-value">+24%</div>
+                    </div>
+                    <div class="float-element float-2">
+                        <div class="float-icon">🎯</div>
+                        <div class="float-label">Targets</div>
+                        <div class="float-value">5 Active</div>
+                    </div>
+                    <div class="float-element float-3">
+                        <div class="float-icon">📅</div>
+                        <div class="float-label">Renewals</div>
+                        <div class="float-value">20 Due</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="section">
+            <div class="section-header" data-reveal="fade-up">
+                <span class="section-tag">Features</span>
+                <h2 class="section-title">Everything You Need</h2>
+                <p class="section-desc">Powerful tools to analyze and manage your insurance portfolio</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card" data-reveal="fade-up" data-delay="1">
+                    <div class="feature-icon">💰</div>
+                    <h3 class="feature-title">Premium Analytics</h3>
+                    <p class="feature-desc">Track Net Premium, Gross Premium, and Average Premium with real-time
+                        calculations</p>
+                </div>
+                <div class="feature-card" data-reveal="fade-up" data-delay="2">
+                    <div class="feature-icon">📅</div>
+                    <h3 class="feature-title">Renewal Tracking</h3>
+                    <p class="feature-desc">Never miss a renewal with upcoming due dates for current and next month</p>
+                </div>
+                <div class="feature-card" data-reveal="fade-up" data-delay="3">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Sales Targets</h3>
+                    <p class="feature-desc">Monitor all your sales targets at a glance with auto-scrolling lists</p>
+                </div>
+                <div class="feature-card" data-reveal="fade-up" data-delay="4">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">Fully Responsive</h3>
+                    <p class="feature-desc">Works beautifully on desktop, tablet, and mobile devices</p>
+                </div>
+                <div class="feature-card" data-reveal="fade-up" data-delay="5">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">100% Private</h3>
+                    <p class="feature-desc">All processing happens in your browser. Your data never leaves your device
+                    </p>
+                </div>
+                <div class="feature-card" data-reveal="fade-up" data-delay="6">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Lightning Fast</h3>
+                    <p class="feature-desc">Instant file processing with Excel (.xlsx, .xls) and CSV support</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Columns Section -->
+        <section id="columns" class="section columns-section">
+            <div class="section-header" data-reveal="fade-up">
+                <span class="section-tag">Setup</span>
+                <h2 class="section-title">Required Columns</h2>
+                <p class="section-desc">Your file should include these column headers</p>
+            </div>
+            <div class="columns-box" data-reveal="scale">
+                <div class="columns-header">
+                    <div class="columns-icon">📋</div>
+                    <div>
+                        <div class="columns-title">Column Structure</div>
+                        <div class="columns-subtitle">Match these column names exactly in your Excel/CSV file</div>
+                    </div>
+                </div>
+                <div class="columns-grid">
+                    <div class="col-chip req" data-reveal="fade-right" data-delay="1"><span
+                            class="col-dot"></span>Client Name</div>
+                    <div class="col-chip req" data-reveal="fade-right" data-delay="2"><span class="col-dot"></span>Net
+                        Premium</div>
+                    <div class="col-chip req" data-reveal="fade-right" data-delay="3"><span class="col-dot"></span>Gross
+                        Premium</div>
+                    <div class="col-chip req" data-reveal="fade-right" data-delay="4"><span
+                            class="col-dot"></span>Policy No</div>
+                    <div class="col-chip req" data-reveal="fade-right" data-delay="5"><span
+                            class="col-dot"></span>Policy End Date</div>
+                    <div class="col-chip opt" data-reveal="fade-right" data-delay="6"><span
+                            class="col-dot"></span>Policy Name</div>
+                    <div class="col-chip opt" data-reveal="fade-right" data-delay="7"><span class="col-dot"></span>Next
+                        Premium Date</div>
+                    <div class="col-chip opt" data-reveal="fade-right" data-delay="8"><span class="col-dot"></span>Sales
+                        Target</div>
+                    <div class="col-chip opt" data-reveal="fade-right" data-delay="9"><span
+                            class="col-dot"></span>Policy Status</div>
+                    <div class="col-chip opt" data-reveal="fade-right" data-delay="10"><span
+                            class="col-dot"></span>Class of Policy</div>
+                    <div class="col-chip opt" data-reveal="fade-right" data-delay="11"><span
+                            class="col-dot"></span>Business Date</div>
+                    <div class="col-chip opt" data-reveal="fade-right" data-delay="12"><span
+                            class="col-dot"></span>Insurer</div>
+                </div>
+                <div class="columns-legend">
+                    <div class="legend-item">
+                        <span class="col-dot"
+                            style="width:8px;height:8px;background:#22c55e;box-shadow:0 0 8px #22c55e;border-radius:50%;"></span>
+                        Required - Core functionality
+                    </div>
+                    <div class="legend-item">
+                        <span class="col-dot"
+                            style="width:8px;height:8px;border:2px solid #555;border-radius:50%;"></span>
+                        Optional - Extra features
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section id="preview" class="cta-section">
+            <div class="cta-glow"></div>
+            <h2 class="cta-title" data-reveal="blur">Ready to Get Started?</h2>
+            <p class="cta-desc" data-reveal="fade-up" data-delay="1">Upload your file and unlock powerful insights in
+                seconds</p>
+            <button class="btn btn-primary cta-btn" data-reveal="zoom" data-delay="2" onclick="openModal()">
+                🚀 Launch Dashboard
+            </button>
+        </section>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Upload Your File</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+
+            <div id="statusMsg" class="status-msg"></div>
+
+            <div id="fileSelected" class="file-selected">
+                <span class="file-icon">📄</span>
+                <div class="file-info">
+                    <div class="file-name" id="fileName"></div>
+                    <div class="file-size" id="fileSize"></div>
+                </div>
+            </div>
+
+            <div id="uploadZone" class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Click to browse or drag & drop</div>
+                <div class="upload-hint">Excel (.xlsx, .xls) or CSV files</div>
+            </div>
+
+            <input type="file" id="fileInput" class="file-input" accept=".csv,.xlsx,.xls"
+                onchange="handleFileSelect(event)">
+
+            <button id="uploadBtn" class="btn btn-primary upload-btn" onclick="processFile()" disabled>
+                🚀 Load Dashboard
+            </button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

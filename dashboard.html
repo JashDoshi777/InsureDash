@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
+    <title>Insurance Analytics Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --bg-hover: #222222;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent-cyan: #00d9ff;
+            --accent-green: #00ff88;
+            --accent-orange: #ff9500;
+            --accent-red: #ff3b30;
+            --accent-purple: #bf5af2;
+            --border: #2a2a2a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            padding: 20px;
+            gap: 16px;
+        }
+
+        /* Metrics Row */
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--metric-color), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .metric-card:hover::before {
+            opacity: 1;
+        }
+
+        .metric-card:hover {
+            border-color: var(--metric-color);
+            transform: translateY(-2px);
+        }
+
+        .metric-card:nth-child(1) {
+            --metric-color: var(--accent-cyan);
+        }
+
+        .metric-card:nth-child(2) {
+            --metric-color: var(--accent-green);
+        }
+
+        .metric-card:nth-child(3) {
+            --metric-color: var(--accent-orange);
+        }
+
+        .metric-card:nth-child(4) {
+            --metric-color: var(--accent-red);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .metric-icon {
+            font-size: 26px;
+            opacity: 0.6;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Renewals Grid */
+        .renewals-container {
+            flex: 1;
+            min-height: 0;
+        }
+
+        .renewals-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            height: 100%;
+        }
+
+        .renewal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: border-color 0.2s ease;
+            min-height: 0;
+        }
+
+        .renewal-card:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        .renewal-card:nth-child(3):hover {
+            border-color: var(--accent-purple);
+        }
+
+        .renewal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-shrink: 0;
+        }
+
+        .renewal-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .renewal-header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .renewal-badge {
+            padding: 4px 10px;
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .renewal-card:nth-child(3) .renewal-badge {
+            background: var(--accent-purple);
+        }
+
+        .speed-control {
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .speed-control:hover {
+            background: var(--bg-card);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .renewal-card:nth-child(3) .speed-control:hover {
+            border-color: var(--accent-purple);
+            color: var(--accent-purple);
+        }
+
+        .renewals-list {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+            scroll-behavior: smooth;
+        }
+
+        .renewal-item {
+            padding: 14px 16px;
+            background: var(--bg-hover);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--accent-cyan);
+            transition: all 0.2s ease;
+        }
+
+        .renewal-item:hover {
+            background: #2a2a2a;
+            border-left-color: var(--accent-green);
+        }
+
+        .renewal-client {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .renewal-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .renewal-date {
+            font-size: 13px;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+
+        .renewal-policy {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .renewal-amount {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-green);
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        /* Sales Target Styles */
+        .sales-target-item {
+            padding: 14px 16px;
+            background: var(--bg-hover);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--accent-purple);
+            transition: all 0.2s ease;
+        }
+
+        .sales-target-item:hover {
+            background: #2a2a2a;
+            border-left-color: var(--accent-cyan);
+        }
+
+        .sales-target-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .empty-state {
+            color: #666;
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 12px;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: var(--bg-primary);
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-card);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        .top-right-widget {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .upload-btn-widget {
+            padding: 10px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+
+        .upload-btn-widget:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-cyan);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 217, 255, 0.2);
+        }
+
+        .upload-btn-widget:active {
+            transform: translateY(0);
+        }
+
+        /* CSV Upload Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 217, 255, 0.2);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent-cyan);
+            background: var(--bg-hover);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--accent-green);
+            background: var(--bg-hover);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .upload-subtext {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-green);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .status-message.success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            display: block;
+        }
+
+        .status-message.error {
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            display: block;
+        }
+
+        .selected-file {
+            padding: 12px 16px;
+            background: var(--bg-hover);
+            border-radius: 6px;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .selected-file.active {
+            display: flex;
+        }
+
+        .file-icon {
+            font-size: 24px;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive Design - Mobile & Tablet */
+        @media (max-width: 1024px) {
+            .dashboard-container {
+                flex-direction: column;
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
+            }
+
+            .main-content {
+                height: auto;
+                min-height: 100vh;
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .metrics-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .renewals-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                height: auto;
+            }
+
+            .renewal-card {
+                min-height: 300px;
+                max-height: 400px;
+            }
+
+            .metric-card {
+                padding: 16px;
+            }
+
+            .metric-value {
+                font-size: 24px;
+            }
+
+            .metric-label {
+                font-size: 11px;
+            }
+
+            .renewal-item,
+            .sales-target-item {
+                padding: 12px;
+            }
+
+            .renewal-client,
+            .sales-target-name {
+                font-size: 14px;
+            }
+
+            .renewal-amount {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .metrics-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .metric-card {
+                padding: 14px;
+            }
+
+            .metric-value {
+                font-size: 20px;
+            }
+
+            .renewal-card {
+                min-height: 250px;
+                max-height: 350px;
+            }
+
+            .top-right-widget {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                justify-content: flex-end;
+            }
+
+            .upload-btn-widget {
+                padding: 12px 16px;
+                font-size: 14px;
+                width: auto;
+            }
+
+            /* Modal adjustments for mobile */
+            .modal-content {
+                margin: 20px;
+                padding: 24px;
+                width: calc(100% - 40px);
+                max-width: none;
+            }
+
+            .upload-area {
+                padding: 30px 15px;
+            }
+
+            .upload-icon {
+                font-size: 36px;
+            }
+
+            .upload-text {
+                font-size: 14px;
+            }
+
+            .upload-subtext {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 10px;
+            }
+
+            .metric-card {
+                padding: 12px;
+            }
+
+            .metric-value {
+                font-size: 18px;
+            }
+
+            .metric-icon {
+                font-size: 20px;
+            }
+
+            .renewal-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .renewal-badge {
+                align-self: flex-start;
+            }
+
+            .renewal-info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+
+            .renewal-amount {
+                text-align: left;
+            }
+
+            /* Touch-friendly button sizes */
+            .btn,
+            .upload-btn-widget {
+                min-height: 44px;
+                padding: 12px 20px;
+            }
+
+            .renewal-item,
+            .sales-target-item {
+                min-height: 60px;
+            }
+        }
+
+        /* Prevent zoom on input for iOS */
+        @media (max-width: 768px) {
+
+            input,
+            select,
+            textarea {
+                font-size: 16px;
+            }
+        }
+
+        /* Enhanced scroll for mobile */
+        @media (max-width: 768px) {
+            .renewals-list {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        /* Orientation-specific adjustments */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .renewal-card {
+                min-height: 200px;
+                max-height: 250px;
+            }
+
+            .metrics-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* High-resolution devices */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+
+            .metric-value,
+            .renewal-client,
+            .sales-target-name {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loading" class="loading-spinner">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="top-right-widget">
+        <button class="upload-btn-widget" onclick="openUploadModal()">
+            📤 Upload CSV
+        </button>
+    </div>
+
+    <!-- CSV Upload Modal -->
+    <div id="uploadModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Upload CSV File</h2>
+                <button class="modal-close" onclick="closeUploadModal()">×</button>
+            </div>
+
+            <div id="statusMessage" class="status-message"></div>
+
+            <div class="selected-file" id="selectedFile">
+                <span class="file-icon">📄</span>
+                <div class="file-info">
+                    <div class="file-name" id="fileName"></div>
+                    <div class="file-size" id="fileSize"></div>
+                </div>
+            </div>
+
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('csvFile').click()">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Click to browse or drag & drop</div>
+                <div class="upload-subtext">CSV files only</div>
+            </div>
+
+            <input type="file" id="csvFile" class="file-input" accept=".csv" onchange="handleFileSelect(event)">
+
+            <button class="btn btn-primary" id="uploadBtn" onclick="uploadCSV()" disabled style="width: 100%;">
+                Upload & Update Dashboard
+            </button>
+        </div>
+    </div>
+
+    <div class="dashboard-container" style="display: none;">
+        <main class="main-content">
+            <div class="metrics-row">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Net Premium</span>
+                        <span class="metric-icon">💰</span>
+                    </div>
+                    <div class="metric-value" id="totalPremium">₹0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Total Policies</span>
+                        <span class="metric-icon">📋</span>
+                    </div>
+                    <div class="metric-value" id="totalPolicies">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Gross Premium</span>
+                        <span class="metric-icon">💎</span>
+                    </div>
+                    <div class="metric-value" id="grossPremium">₹0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Avg Premium</span>
+                        <span class="metric-icon">📊</span>
+                    </div>
+                    <div class="metric-value" id="avgPremium">₹0</div>
+                </div>
+            </div>
+
+            <div class="renewals-container">
+                <div class="renewals-grid">
+                    <div class="renewal-card">
+                        <div class="renewal-header">
+                            <h3 class="renewal-title" id="renewal1Title">Renewals</h3>
+                            <div class="renewal-header-right">
+                                <button class="speed-control" onclick="cycleSpeed(1)">
+                                    <span id="speedIcon1">⚡</span>
+                                    <span id="speedText1">1x</span>
+                                </button>
+                                <span class="renewal-badge" id="renewal1Count">0</span>
+                            </div>
+                        </div>
+                        <div class="renewals-list" id="renewals1"></div>
+                    </div>
+
+                    <div class="renewal-card">
+                        <div class="renewal-header">
+                            <h3 class="renewal-title" id="renewal2Title">Renewals</h3>
+                            <div class="renewal-header-right">
+                                <button class="speed-control" onclick="cycleSpeed(2)">
+                                    <span id="speedIcon2">⚡</span>
+                                    <span id="speedText2">1x</span>
+                                </button>
+                                <span class="renewal-badge" id="renewal2Count">0</span>
+                            </div>
+                        </div>
+                        <div class="renewals-list" id="renewals2"></div>
+                    </div>
+
+                    <div class="renewal-card">
+                        <div class="renewal-header">
+                            <h3 class="renewal-title" id="renewal3Title">Sales Targets</h3>
+                            <div class="renewal-header-right">
+                                <button class="speed-control" onclick="cycleSpeed(3)">
+                                    <span id="speedIcon3">⚡</span>
+                                    <span id="speedText3">1x</span>
+                                </button>
+                                <span class="renewal-badge" id="renewal3Count">0</span>
+                            </div>
+                        </div>
+                        <div class="renewals-list" id="renewals3"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let refreshInterval;
+        let selectedFile = null;
+
+        // Auto-scroll configuration with accumulator for fractional pixels
+        const scrollers = {
+            1: { interval: null, speed: 1, direction: 1, pixelsPerFrame: 1, pauseTimeout: null, accumulator: 0 },
+            2: { interval: null, speed: 1, direction: 1, pixelsPerFrame: 1, pauseTimeout: null, accumulator: 0 },
+            3: { interval: null, speed: 1, direction: 1, pixelsPerFrame: 1, pauseTimeout: null, accumulator: 0 }
+        };
+
+        const speedConfigs = [
+            { multiplier: 0.5, label: '0.5x', pixels: 0.5 },
+            { multiplier: 1, label: '1x', pixels: 1 },
+            { multiplier: 1.5, label: '1.5x', pixels: 1.5 },
+            { multiplier: 2, label: '2x', pixels: 2 }
+        ];
+
+        function handleResponsiveLayout() {
+            const isMobile = window.innerWidth <= 768;
+            const isTablet = window.innerWidth <= 1024 && window.innerWidth > 768;
+
+            if (isMobile) {
+                document.body.classList.add('mobile-view');
+                document.body.classList.remove('tablet-view', 'desktop-view');
+            } else if (isTablet) {
+                document.body.classList.add('tablet-view');
+                document.body.classList.remove('mobile-view', 'desktop-view');
+            } else {
+                document.body.classList.add('desktop-view');
+                document.body.classList.remove('mobile-view', 'tablet-view');
+            }
+        }
+
+        window.onload = function () {
+            console.log('Dashboard initializing...');
+            loadDashboard();
+            startAutoRefresh();
+            setupDragAndDrop();
+            handleResponsiveLayout();
+
+            window.addEventListener('resize', handleResponsiveLayout);
+            window.addEventListener('orientationchange', function () {
+                setTimeout(handleResponsiveLayout, 100);
+            });
+        };
+
+        function startAutoRefresh() {
+            refreshInterval = setInterval(() => {
+                console.log('Auto-refreshing dashboard...');
+                loadDashboard();
+            }, 3600000);
+        }
+
+        function loadDashboard() {
+            console.log('Loading dashboard data from IndexedDB...');
+
+            // Open IndexedDB and get data
+            const request = indexedDB.open('InsureAnalyticsDB', 1);
+
+            request.onerror = function () {
+                console.error('IndexedDB error');
+                alert('Error loading data. Please upload a file from the landing page.');
+                window.location.href = 'index.html';
+            };
+
+            request.onsuccess = function (e) {
+                const db = e.target.result;
+                const tx = db.transaction('data', 'readonly');
+                const store = tx.objectStore('data');
+                const getRequest = store.get('dashboardData');
+
+                getRequest.onsuccess = function () {
+                    const records = getRequest.result;
+
+                    if (!records || records.length === 0) {
+                        alert('No data found. Please upload a file from the landing page.');
+                        window.location.href = 'index.html';
+                        return;
+                    }
+
+                    console.log('Data loaded:', records.length, 'records');
+
+                    // Calculate analytics
+                    const analytics = getAnalytics(records);
+
+                    updateMetrics(analytics.metrics);
+                    renderRenewals(analytics.renewals);
+                    renderSalesTargets(analytics.salesTargets);
+                    hideLoading();
+                    startAllScrollers();
+                };
+
+                getRequest.onerror = function () {
+                    alert('Error reading data. Please upload a file from the landing page.');
+                    window.location.href = 'index.html';
+                };
+            };
+
+            request.onupgradeneeded = function (e) {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('data')) {
+                    db.createObjectStore('data');
+                }
+            };
+        }
+
+        function getAnalytics(records) {
+            const totalPremium = records.reduce((sum, r) => sum + (parseFloat(r['Net Premium']) || 0), 0);
+            const grossPremium = records.reduce((sum, r) => sum + (parseFloat(r['Gross Premium']) || 0), 0);
+            const totalPolicies = records.length;
+            const avgPremium = totalPolicies > 0 ? totalPremium / totalPolicies : 0;
+
+            return {
+                metrics: { totalPremium, grossPremium, totalPolicies, avgPremium },
+                renewals: getUpcomingRenewals(records),
+                salesTargets: getSalesTargets(records)
+            };
+        }
+
+        function getUpcomingRenewals(data) {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            const months = [
+                { month: currentMonth, year: currentYear, name: getMonthName(currentMonth) },
+                { month: (currentMonth + 1) % 12, year: currentMonth + 1 > 11 ? currentYear + 1 : currentYear, name: getMonthName(currentMonth + 1) }
+            ];
+
+            return months.map(m => {
+                const monthStart = new Date(m.year, m.month, 1);
+                const monthEnd = new Date(m.year, m.month + 1, 0);
+
+                const items = data
+                    .filter(r => {
+                        const date = parseDate(r['Policy End Date']) || parseDate(r['Next Premium Date']);
+                        return date && date >= monthStart && date <= monthEnd;
+                    })
+                    .map(r => ({
+                        client: r['Client Name'] || 'Unknown',
+                        date: formatDate(parseDate(r['Policy End Date']) || parseDate(r['Next Premium Date'])),
+                        premium: parseFloat(r['Net Premium']) || 0,
+                        policy: r['Policy Name'] || r['Policy No'] || 'N/A'
+                    }))
+                    .sort((a, b) => b.premium - a.premium);
+
+                return { month: m.name, items };
+            });
+        }
+
+        function getSalesTargets(data) {
+            const targets = new Set();
+            data.forEach(r => {
+                const target = r['Sales Target'];
+                if (target && target.toString().trim()) {
+                    targets.add(target.toString().trim());
+                }
+            });
+            return Array.from(targets).sort();
+        }
+
+        function parseDate(value) {
+            if (!value) return null;
+            if (value instanceof Date) return value;
+            if (typeof value === 'number') {
+                const excelEpoch = new Date(1899, 11, 30);
+                return new Date(excelEpoch.getTime() + value * 86400000);
+            }
+            const parsed = new Date(value);
+            return isNaN(parsed.getTime()) ? null : parsed;
+        }
+
+        function formatDate(date) {
+            if (!date) return 'N/A';
+            return String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear();
+        }
+
+        function getMonthName(index) {
+            return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][index % 12];
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.querySelector('.dashboard-container').style.display = 'flex';
+        }
+
+        function updateMetrics(metrics) {
+            document.getElementById('totalPremium').textContent =
+                '₹' + (metrics.totalPremium || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+            document.getElementById('totalPolicies').textContent =
+                (metrics.totalPolicies || 0).toLocaleString('en-IN');
+            document.getElementById('grossPremium').textContent =
+                '₹' + (metrics.grossPremium || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+            document.getElementById('avgPremium').textContent =
+                '₹' + (metrics.avgPremium || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        }
+
+        function renderRenewals(renewals) {
+            const months = ['renewals1', 'renewals2'];
+            const titles = ['renewal1Title', 'renewal2Title'];
+            const counts = ['renewal1Count', 'renewal2Count'];
+
+            if (!renewals) return;
+
+            months.forEach((monthId, idx) => {
+                const container = document.getElementById(monthId);
+                const monthData = renewals[idx] || {};
+                const items = monthData.items || [];
+
+                document.getElementById(titles[idx]).textContent =
+                    `${monthData.month || 'Month'} Renewals`;
+                document.getElementById(counts[idx]).textContent = items.length;
+
+                container.innerHTML = '';
+                if (items.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No renewals this month</div>';
+                } else {
+                    items.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'renewal-item';
+                        div.innerHTML = `
+              <div class="renewal-client">${item.client || 'Unknown Client'}</div>
+              <div class="renewal-info-row">
+                <div class="renewal-date">📅 ${item.date || 'N/A'}</div>
+                <div class="renewal-amount">₹${(item.premium || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+              </div>
+              <div class="renewal-policy">Policy: ${item.policy || 'N/A'}</div>
+            `;
+                        container.appendChild(div);
+                    });
+                }
+            });
+        }
+
+        function renderSalesTargets(salesTargets) {
+            const container = document.getElementById('renewals3');
+
+            document.getElementById('renewal3Count').textContent = salesTargets ? salesTargets.length : 0;
+
+            container.innerHTML = '';
+            if (!salesTargets || salesTargets.length === 0) {
+                container.innerHTML = '<div class="empty-state">No sales targets found</div>';
+            } else {
+                salesTargets.forEach(target => {
+                    const div = document.createElement('div');
+                    div.className = 'sales-target-item';
+                    div.innerHTML = `
+            <div class="sales-target-name">${target}</div>
+          `;
+                    container.appendChild(div);
+                });
+            }
+        }
+
+        // Auto-scroll functionality - FIXED VERSION with accumulator
+        function startAllScrollers() {
+            for (let i = 1; i <= 3; i++) {
+                startScroller(i);
+            }
+        }
+
+        function startScroller(scrollerNum) {
+            const container = document.getElementById('renewals' + scrollerNum);
+            if (!container) return;
+
+            // Clear existing interval and timeout if any
+            stopScroller(scrollerNum);
+
+            // Only start scrolling if there's content to scroll
+            if (container.scrollHeight <= container.clientHeight) {
+                return; // No need to scroll if content fits
+            }
+
+            const scroller = scrollers[scrollerNum];
+            scroller.accumulator = 0; // Reset accumulator
+
+            scroller.interval = setInterval(() => {
+                const maxScroll = container.scrollHeight - container.clientHeight;
+
+                // If no scrollable content, stop
+                if (maxScroll <= 0) {
+                    stopScroller(scrollerNum);
+                    return;
+                }
+
+                // Add fractional pixels to accumulator
+                scroller.accumulator += scroller.pixelsPerFrame;
+
+                // Only scroll when we have at least 1 whole pixel
+                if (Math.abs(scroller.accumulator) >= 1) {
+                    const pixelsToScroll = Math.floor(scroller.accumulator);
+                    scroller.accumulator -= pixelsToScroll; // Keep the remainder
+
+                    // Scroll down
+                    if (scroller.direction === 1) {
+                        container.scrollTop += pixelsToScroll;
+
+                        // Check if reached bottom (with 2px threshold)
+                        if (container.scrollTop >= maxScroll - 2) {
+                            container.scrollTop = maxScroll; // Snap to bottom
+                            scroller.direction = -1; // Change direction to up
+                            scroller.accumulator = 0; // Reset accumulator
+                            // Pause at bottom
+                            clearInterval(scroller.interval);
+                            scroller.pauseTimeout = setTimeout(() => {
+                                startScroller(scrollerNum);
+                            }, 800);
+                        }
+                    }
+                    // Scroll up
+                    else {
+                        container.scrollTop -= pixelsToScroll;
+
+                        // Check if reached top (with 2px threshold)
+                        if (container.scrollTop <= 2) {
+                            container.scrollTop = 0; // Snap to top
+                            scroller.direction = 1; // Change direction to down
+                            scroller.accumulator = 0; // Reset accumulator
+                            // Pause at top
+                            clearInterval(scroller.interval);
+                            scroller.pauseTimeout = setTimeout(() => {
+                                startScroller(scrollerNum);
+                            }, 800);
+                        }
+                    }
+                }
+            }, 30); // 30ms interval for smooth scrolling
+        }
+
+        function stopScroller(scrollerNum) {
+            const scroller = scrollers[scrollerNum];
+
+            if (scroller.interval) {
+                clearInterval(scroller.interval);
+                scroller.interval = null;
+            }
+
+            if (scroller.pauseTimeout) {
+                clearTimeout(scroller.pauseTimeout);
+                scroller.pauseTimeout = null;
+            }
+        }
+
+        function cycleSpeed(scrollerNum) {
+            const scroller = scrollers[scrollerNum];
+            const currentIndex = speedConfigs.findIndex(c => c.multiplier === scroller.speed);
+            const nextIndex = (currentIndex + 1) % speedConfigs.length;
+            const nextConfig = speedConfigs[nextIndex];
+
+            // Update speed
+            scroller.speed = nextConfig.multiplier;
+            scroller.pixelsPerFrame = nextConfig.pixels;
+            scroller.accumulator = 0; // Reset accumulator when changing speed
+
+            // Update UI
+            document.getElementById('speedText' + scrollerNum).textContent = nextConfig.label;
+
+            // Update icon based on speed
+            const icon = nextConfig.multiplier <= 0.5 ? '🐌' :
+                nextConfig.multiplier === 1 ? '⚡' :
+                    nextConfig.multiplier === 1.5 ? '⚡⚡' : '🚀';
+            document.getElementById('speedIcon' + scrollerNum).textContent = icon;
+
+            // Restart scroller with new speed
+            stopScroller(scrollerNum);
+            startScroller(scrollerNum);
+        }
+
+        // CSV Upload Functions
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+            resetUploadModal();
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+            resetUploadModal();
+        }
+
+        function resetUploadModal() {
+            selectedFile = null;
+            document.getElementById('csvFile').value = '';
+            document.getElementById('selectedFile').classList.remove('active');
+            document.getElementById('uploadBtn').disabled = true;
+            document.getElementById('statusMessage').className = 'status-message';
+            document.getElementById('statusMessage').textContent = '';
+        }
+
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            if (!file.name.endsWith('.csv')) {
+                showStatus('Please select a CSV file', 'error');
+                return;
+            }
+
+            selectedFile = file;
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            document.getElementById('selectedFile').classList.add('active');
+            document.getElementById('uploadBtn').disabled = false;
+            document.getElementById('statusMessage').className = 'status-message';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function uploadCSV() {
+            if (!selectedFile) return;
+
+            document.getElementById('uploadBtn').disabled = true;
+            document.getElementById('uploadBtn').textContent = '⏳ Uploading...';
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const csvData = e.target.result;
+
+                google.script.run
+                    .withSuccessHandler(function (response) {
+                        if (response.success) {
+                            showStatus(response.message, 'success');
+                            document.getElementById('uploadBtn').textContent = '✓ Upload Complete';
+
+                            // Stop all scrollers before reload
+                            for (let i = 1; i <= 3; i++) {
+                                stopScroller(i);
+                            }
+
+                            // Reload dashboard after 1.5 seconds
+                            setTimeout(() => {
+                                closeUploadModal();
+                                document.getElementById('loading').style.display = 'flex';
+                                document.querySelector('.dashboard-container').style.display = 'none';
+                                loadDashboard();
+                            }, 1500);
+                        } else {
+                            showStatus(response.message, 'error');
+                            document.getElementById('uploadBtn').textContent = 'Upload & Update Dashboard';
+                            document.getElementById('uploadBtn').disabled = false;
+                        }
+                    })
+                    .withFailureHandler(function (error) {
+                        showStatus('Upload failed: ' + error.message, 'error');
+                        document.getElementById('uploadBtn').textContent = 'Upload & Update Dashboard';
+                        document.getElementById('uploadBtn').disabled = false;
+                    })
+                    .uploadCSV(csvData);
+            };
+
+            reader.onerror = function () {
+                showStatus('Error reading file', 'error');
+                document.getElementById('uploadBtn').textContent = 'Upload & Update Dashboard';
+                document.getElementById('uploadBtn').disabled = false;
+            };
+
+            reader.readAsText(selectedFile);
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = 'status-message ' + type;
+        }
+
+        // Clean up intervals when page unloads
+        window.addEventListener('beforeunload', () => {
+            for (let i = 1; i <= 3; i++) {
+                stopScroller(i);
+            }
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+    </script>
+</body>
+
+</html>
